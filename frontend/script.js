@@ -1,16 +1,20 @@
-const BACKEND_URL = "http://localhost:3000";  
+const BACKEND_URL = "https://chat-backend-lhas.onrender.com";  
 const socket = io(BACKEND_URL);
 
 // Load old messages
 async function loadMessages() {
-  const res = await fetch(`${BACKEND_URL}/messages`);
-  const messages = await res.json();
+  try {
+    const res = await fetch(`${BACKEND_URL}/messages`);
+    const messages = await res.json();
 
-  const box = document.getElementById("chat-box");
+    const box = document.getElementById("chat-box");
 
-  messages.forEach((m) => {
-    box.innerHTML += `<p><b>${m.username}:</b> ${m.message}</p>`;
-  });
+    messages.forEach((m) => {
+      box.innerHTML += `<p><b>${m.username}:</b> ${m.message}</p>`;
+    });
+  } catch (err) {
+    console.error("Failed to load messages", err);
+  }
 }
 
 // Send message
@@ -31,5 +35,5 @@ socket.on("receive_message", (msg) => {
   box.innerHTML += `<p><b>${msg.username}:</b> ${msg.message}</p>`;
 });
 
-// Load old messages when page opens
+// Load messages on start
 window.onload = loadMessages;
