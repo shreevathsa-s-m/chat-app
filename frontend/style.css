@@ -1,103 +1,55 @@
-/* Background */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  background: linear-gradient(135deg, #5b2be0, #2dd4bf);
-  height: 100vh;
+/* Message row container */
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  margin: 8px 0;
+  animation: slideIn 0.2s ease;
+}
+
+/* Avatar circle */
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #6d28d9;
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* Main chat container */
-.container {
-  width: 420px;
-  background: #ffffffdd;
-  backdrop-filter: blur(10px);
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.8s ease;
-}
-
-/* Title */
-h2 {
-  text-align: center;
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 24px;
   font-weight: 600;
+  margin-right: 10px;
 }
 
-/* Chat box */
-#chat-box {
-  height: 320px;
-  border-radius: 12px;
-  padding: 12px;
-  background: #f5f7fa;
-  overflow-y: auto;
-  margin-bottom: 15px;
-  border-left: 4px solid #8b5cf6;
+/* Bubble base style */
+.bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
 }
 
-#chat-box p {
-  background: #8b5cf6;
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 12px;
-  margin: 5px 0;
-  color: white;
-  animation: slideIn 0.25s ease;
-}
-
-/* Inputs */
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0;
-  border-radius: 10px;
-  border: 2px solid #ddd;
-  font-size: 16px;
-  outline: none;
-  transition: 0.2s ease;
-}
-
-input:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 8px #c4b5fd;
-}
-
-/* Button */
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 5px;
-  border: none;
+/* Other users bubble (left) */
+.bubble-left {
   background: #8b5cf6;
   color: white;
-  font-size: 18px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s ease;
+  border-bottom-left-radius: 0;
 }
 
-button:hover {
-  background: #6d28d9;
-  transform: translateY(-2px);
+/* Your messages bubble (right) */
+.bubble-right {
+  background: #4f46e5;
+  color: white;
+  border-bottom-right-radius: 0;
+  margin-left: auto;
 }
 
-button:active {
-  transform: scale(0.97);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
+/* Timestamp */
+.time {
+  font-size: 11px;
+  color: #444;
+  margin-top: 2px;
+  display: block;
+  opacity: 0.8;
 }
