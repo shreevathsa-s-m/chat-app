@@ -1,9 +1,31 @@
+/* Chat box container fix */
+#chat-box {
+  height: 300px;
+  background: #f5f7fa;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Message row container */
 .message-row {
   display: flex;
-  align-items: flex-end;
+  width: 100%;
   margin: 8px 0;
   animation: slideIn 0.2s ease;
+}
+
+/* Align messages */
+.message-right {
+  justify-content: flex-end;
+}
+
+.message-left {
+  justify-content: flex-start;
 }
 
 /* Avatar circle */
@@ -17,7 +39,7 @@
   justify-content: center;
   align-items: center;
   font-weight: 600;
-  margin-right: 10px;
+  margin: 0 10px 0 0;
 }
 
 /* Bubble base style */
@@ -52,4 +74,10 @@
   margin-top: 2px;
   display: block;
   opacity: 0.8;
+}
+
+/* Animation */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
