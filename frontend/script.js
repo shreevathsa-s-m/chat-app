@@ -3,12 +3,12 @@ const socket = io(BACKEND_URL);
 
 let joined = false;
 
-// Utility: Get time
+// Get formatted time
 function getTime() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-// Short helper for getElementById
+// Shortcut for querySelector
 function qs(id) {
   return document.getElementById(id);
 }
@@ -20,30 +20,28 @@ async function loadMessages() {
     const messages = await res.json();
     messages.forEach(m => addMessage(m.username, m.message));
   } catch (e) {
-    console.log("Error loading history");
+    console.log("History load error");
   }
 }
 
-// Join chat (called intentionally when user confirms their name)
+// ===== FIX: JOIN ONLY WHEN USER CLICKS "SET" =====
 function joinChat() {
   const username = qs("username").value.trim();
+
   if (!username) return;
 
-  // If already joined but username changed, re-join with new name
-  socket.emit("join", username);
+  socket.emit("join", username);   // send FULL name only
   joined = true;
-  // optional: provide visual feedback that name is set
-  qs("set-name").textContent = "Set";
 }
 
-// Send message (form submit)
+// Send message
 function sendMessage(e) {
   if (e) e.preventDefault();
 
   const username = qs("username").value.trim();
   const message = qs("message").value.trim();
 
-  // If user hasn't set a name yet, join now with the full name
+  // If name not set yet, join now
   if (!joined && username) {
     joinChat();
   }
@@ -59,7 +57,7 @@ socket.on("receive_message", data => {
   addMessage(data.username, data.message);
 });
 
-// Add message bubble to UI (keep your existing structure)
+// UI message bubble builder
 function addMessage(username, message) {
   const chatBox = qs("chat-box");
   const me = qs("username").value.trim();
@@ -68,7 +66,6 @@ function addMessage(username, message) {
   const row = document.createElement("div");
   row.className = "message-row";
 
-  // Avatar (left side) or spacer for my messages
   if (!isMe) {
     const avatar = document.createElement("div");
     avatar.className = "avatar";
@@ -105,50 +102,36 @@ function addMessage(username, message) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// =============================
-// ONLINE USERS REAL-TIME EVENTS
-// =============================
+// ===== ONLINE USERS LIST =====
 socket.on("online_users", (data) => {
   const { count, users } = data;
 
-  // Update online count text
-  const oc = qs("online-count");
-  if (oc) oc.innerText = `Online Users: ${count}`;
+  qs("online-count").innerText = `Online Users: ${count}`;
 
-  // Update list
   const list = qs("online-list");
-  if (list) {
-    list.innerHTML = "";
-    users.forEach(u => {
-      list.innerHTML += `<li>${u}</li>`;
-    });
-  }
+  list.innerHTML = "";
+
+  users.forEach(u => {
+    list.innerHTML += `<li>${u}</li>`;
+  });
 });
 
-// Wire up UI events after DOM ready
+// ===== EVENTS ON PAGE LOAD =====
 window.onload = () => {
   loadMessages();
 
-  // Set-name button click — user confirms their full name
-  const setBtn = qs("set-name");
-  if (setBtn) {
-    setBtn.addEventListener("click", () => {
+  // Join only when Set button clicked
+  qs("set-name").addEventListener("click", () => {
+    joinChat();
+    qs("message").focus();
+  });
+
+  // Enter key in username field also sets name
+  qs("username").addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
       joinChat();
       qs("message").focus();
-    });
-  }
-
-  // Also allow Enter key in username input to set name
-  const usernameInput = qs("username");
-  if (usernameInput) {
-    usernameInput.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter") {
-        ev.preventDefault();
-        joinChat();
-        qs("message").focus();
-      }
-    });
-  }
-
-  // Optional: if user presses Enter in message box, the form onsubmit already calls sendMessage
+    }
+  });
 };
