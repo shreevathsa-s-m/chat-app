@@ -183,6 +183,7 @@ body{
   list-style: none;
   padding: 0;
   margin: 0;
+  display: block !important;   /* 🔥 FIX */
 }
 
 /* FIXED FULL NAME DISPLAY */
@@ -194,9 +195,10 @@ body{
   font-size: 14px;
   color: #1e293b;
   font-weight: 500;
-  display: block;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  
+  display: block !important;   /* 🔥 FIX */
+  width: 100% !important;      /* 🔥 FIX */
+  white-space: nowrap;         /* 🔥 FIX */
+  overflow: hidden;            /* 🔥 FIX */
+  text-overflow: ellipsis;     /* 🔥 FIX */
 }
