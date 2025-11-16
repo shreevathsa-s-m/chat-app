@@ -112,7 +112,9 @@ socket.on("online_users", (data) => {
   list.innerHTML = "";
 
   users.forEach(u => {
-    list.innerHTML += `<li>${u}</li>`;
+    if (u && u.trim() !== "") {
+      list.innerHTML += `<li>${u}</li>`;
+    }
   });
 });
 
