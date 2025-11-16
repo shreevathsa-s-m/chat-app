@@ -1,73 +1,134 @@
-const BACKEND_URL = "https://chat-backend-lhas.onrender.com";  
+const BACKEND_URL = "https://chat-backend-lhas.onrender.com";
 const socket = io(BACKEND_URL);
 
+let joined = false;
+
+// Utility: Get time
 function getTime() {
-  const now = new Date();
-  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-// Load old messages
+// Short helper for querySelector
+function qs(id) {
+  return document.getElementById(id);
+}
+
+// Load old messages from backend
 async function loadMessages() {
   try {
     const res = await fetch(`${BACKEND_URL}/messages`);
     const messages = await res.json();
-
-    messages.forEach((m) => addMessage(m.username, m.message));
-  } catch (err) {
-    console.error("Failed to load messages", err);
+    messages.forEach(m => addMessage(m.username, m.message));
+  } catch (e) {
+    console.log("Error loading history");
   }
 }
 
+// Join chat when username is entered
+function joinChat() {
+  const username = qs("username").value.trim();
+
+  if (!joined && username !== "") {
+    socket.emit("join", username);
+    joined = true;
+  }
+}
+
+// Detect username being typed or changed
+qs("username").addEventListener("keyup", joinChat);
+qs("username").addEventListener("change", joinChat);
+
 // Send message
-function sendMessage() {
-  const username = document.getElementById("username").value;
-  const message = document.getElementById("message").value;
+function sendMessage(e) {
+  if (e) e.preventDefault();
+
+  const username = qs("username").value.trim();
+  const message = qs("message").value.trim();
 
   if (!username || !message) return;
 
   socket.emit("send_message", { username, message });
-  document.getElementById("message").value = "";
+  qs("message").value = "";
 }
 
-// Receive live message
-socket.on("receive_message", (msg) => {
-  addMessage(msg.username, msg.message);
+// Receive real-time messages
+socket.on("receive_message", data => {
+  addMessage(data.username, data.message);
 });
 
-// Add message to UI with bubble + avatar + time
+// Add message bubble to UI
 function addMessage(username, message) {
-  const chatBox = document.getElementById("chat-box");
-
-  const currentUser = document.getElementById("username").value;
-  const isMe = username === currentUser;
+  const chatBox = qs("chat-box");
+  const me = qs("username").value.trim();
+  const isMe = me && username === me;
 
   const row = document.createElement("div");
-  row.classList.add("message-row");
+  row.className = "message-row";
 
-  // Avatar (for others only)
-  let avatar = "";
+  // Avatar (left side)
   if (!isMe) {
-    const letter = username.charAt(0).toUpperCase();
-    avatar = `<div class="avatar">${letter}</div>`;
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = username.charAt(0).toUpperCase();
+    row.appendChild(avatar);
+  } else {
+    let space = document.createElement("div");
+    space.style.width = "36px";
+    row.appendChild(space);
   }
 
-  // Bubble
-  const bubbleClass = isMe ? "bubble bubble-right" : "bubble bubble-left";
+  const group = document.createElement("div");
+  group.className = "msg-group";
 
-  row.innerHTML = `
-    ${isMe ? "" : avatar}
-    <div>
-      <div class="${bubbleClass}">
-        <b>${username}:</b> ${message}
-      </div>
-      <span class="time">${getTime()}</span>
-    </div>
-  `;
+  const name = document.createElement("div");
+  name.className = "name";
+  name.textContent = username;
 
+  const bubble = document.createElement("div");
+  bubble.className = isMe ? "bubble bubble-right" : "bubble bubble-left";
+  bubble.textContent = message;
+
+  const time = document.createElement("div");
+  time.className = "time";
+  time.textContent = getTime();
+
+  group.appendChild(name);
+  group.appendChild(bubble);
+  group.appendChild(time);
+
+  row.appendChild(group);
   chatBox.appendChild(row);
 
-  // Auto-scroll to latest
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-window.onload = loadMessages;
+// =============================
+// ONLINE USERS REAL-TIME EVENTS
+// =============================
+
+// Listen for online users update
+socket.on("online_users", (data) => {
+  const { count, users } = data;
+
+  // Update online count text
+  qs("online-count").innerText = `Online Users: ${count}`;
+
+  // Update list
+  const list = qs("online-list");
+  list.innerHTML = "";
+
+  users.forEach(u => {
+    list.innerHTML += `<li>${u}</li>`;
+  });
+});
+
+// On window load
+window.onload = () => {
+  loadMessages();
+
+  qs("set-name").onclick = () => {
+    if (qs("username").value.trim()) {
+      qs("message").focus();
+    }
+  };
+};

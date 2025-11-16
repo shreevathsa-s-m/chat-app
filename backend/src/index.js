@@ -27,17 +27,43 @@ app.get("/messages", async (req, res) => {
   }
 });
 
+// ===========================
+// REAL-TIME SOCKET.IO EVENTS
+// ===========================
+
+let onlineUsers = {};   // { socketId: username }
+
 // WebSocket events
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  // When frontend sends username after joining
+  socket.on("join", (username) => {
+    onlineUsers[socket.id] = username;
+
+    // Send updated online list + count
+    io.emit("online_users", {
+      count: Object.keys(onlineUsers).length,
+      users: Object.values(onlineUsers),
+    });
+  });
+
+  // When a new message is sent
   socket.on("send_message", async (msg) => {
     await db.saveMessage(msg.username, msg.message);
     io.emit("receive_message", msg);
   });
 
+  // When user disconnects / closes tab
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
+    delete onlineUsers[socket.id];
+
+    // Update others after disconnect
+    io.emit("online_users", {
+      count: Object.keys(onlineUsers).length,
+      users: Object.values(onlineUsers),
+    });
   });
 });
 

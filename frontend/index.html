@@ -1,21 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Chat App</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Real-Time Chat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <main class="app">
+    <header class="app-header">
+      <h1>Real-Time Chat</h1>
+      <p class="sub">Backend is already deployed — frontend only.</p>
 
-  <div class="container">
-    <h2>Real-Time Chat App</h2>
+      <!-- ONLINE USER COUNT ADDED HERE -->
+      <p id="online-count" class="online-count">Online Users: 0</p>
 
-    <input id="username" placeholder="Enter your name" />
+      <!-- ONLINE USER LIST ADDED HERE -->
+      <div class="online-box">
+        <h4>Online Now</h4>
+        <ul id="online-list"></ul>
+      </div>
+    </header>
 
-    <div id="chat-box"></div>
+    <section class="chat-panel">
+      <div class="top-row">
+        <label class="username-label">
+          <input id="username" placeholder="Your name" maxlength="20" />
+        </label>
+        <button id="set-name" class="btn small">Set</button>
+      </div>
 
-    <input id="message" placeholder="Type a message" />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+      <div id="chat-box" role="log" aria-live="polite"></div>
+
+      <form id="compose" class="compose" onsubmit="sendMessage(event)">
+        <input id="message" autocomplete="off" placeholder="Type a message and press Enter" />
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+
+    <footer class="app-footer">
+      <small>Connected to backend — messages load from server.</small>
+    </footer>
+  </main>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="script.js"></script>
