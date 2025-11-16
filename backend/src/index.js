@@ -41,7 +41,9 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start backend server
-server.listen(3000, () => {
-  console.log("Backend running at http://localhost:3000");
+// Render-friendly port
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
 });
